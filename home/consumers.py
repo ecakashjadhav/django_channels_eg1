@@ -39,13 +39,13 @@ class NewConsumer(AsyncJsonWebsocketConsumer):
         await self.send(text_data=json.dumps({'status':'new consumer connected'}))
 
     async def receive(self,*, text_data):
-        print(text_data)
+        # print(text_data)
         await self.send(text_data=json.dumps({'status':'We got you'}))
 
     async def disconnect(self,message):
-        await print("disconnect")
+        print("disconnect")
 
     async def send_notification(self,event):
-        print(event)
+        # print(event)
         data = json.loads(event.get('value'))
         await self.send(text_data=json.dumps({'payload': data}))

@@ -3,6 +3,8 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
 import time
+from django.http import JsonResponse
+from .thread import *
 
 # def home(request):
 #     for i in range(0,10):
@@ -30,3 +32,10 @@ async def home(request):
         ) 
         time.sleep(1)
     return render(request,'home.html')
+
+
+def generate_student_data(request):
+    total = request.GET.get('total')
+    CreateStudentThread(int(total)).start()
+    return JsonResponse({"status":200})
+
