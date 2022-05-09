@@ -1,7 +1,7 @@
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 import json
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from channels.generic.websocket import AsyncJsonWebsocketConsumer,JsonWebsocketConsumer
 
 class TestConsumer(WebsocketConsumer):
 
@@ -49,3 +49,29 @@ class NewConsumer(AsyncJsonWebsocketConsumer):
         # print(event)
         data = json.loads(event.get('value'))
         await self.send(text_data=json.dumps({'payload': data}))
+
+# chat app.
+class MyJsonWebsocketConsumer(JsonWebsocketConsumer):
+    def connect(self):
+        print('Websocker connected')
+        self.accept()
+
+    def receive_json(self, content, **kwargs):
+        print('msg received..',content)
+        self.send_json({"msg":"send from server to client"})
+
+    def disconnect(self,close_code):
+        print('Websocker disconnected',close_code)
+
+
+class MyAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        print('Websocker connected')
+        await self.accept()
+
+    async def receive_json(self, content, **kwargs):
+        print('msg received..',content)
+        await self.send_json({"msg":"send from server to client"})
+
+    async def disconnect(self,close_code):
+        print('Websocker disconnected',close_code)
