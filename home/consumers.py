@@ -2,6 +2,7 @@ from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer,JsonWebsocketConsumer
+from .models import *
 
 class TestConsumer(WebsocketConsumer):
 
@@ -64,6 +65,9 @@ class MyJsonWebsocketConsumer(JsonWebsocketConsumer):
 
     def receive_json(self, content, **kwargs):
         print('msg received..',content)
+        group = Group.objects.get(name=self.group_name)
+        chat = Chat(content = content['msg'],group=group)
+        chat.save()
         async_to_sync(self.channel_layer.group_send)(self.group_name,{'type':'chat.message','message':content['msg']})
     
     def chat_message(self,event):

@@ -13,7 +13,11 @@
   <body>
       <div class="container mt-5">
         <h2>Group Name: {{groupname}}</h2>
-        <textarea rows="3" id='chat-log' class='form-control'></textarea><br>
+        <textarea rows="20" id='chat-log' class='form-control'>
+          {% for chat in chats %}
+            {{chat.content}}
+          {% endfor %}
+        </textarea><br>
         <input type="text" id='chat-message-input' size='100' class='form-control'><br>
         <input type="button" id='chat-message-submit' value='Send' class='btn btn-success'><br>
         {{ groupname|json_script:"group-name" }}

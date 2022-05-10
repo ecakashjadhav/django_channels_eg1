@@ -35,7 +35,11 @@ async def home(request):
 
 def chat(request,group_name=None):
     print(group_name)
-    return render(request,'chat.html',{"groupname":group_name})
+    g,created=Group.objects.get_or_create(name=group_name)
+    chats = []
+    if g:
+        chats = Chat.objects.filter(group=g)
+    return render(request,'chat.html',{"groupname":group_name,"chats":chats})
 
 
 def generate_student_data(request):
