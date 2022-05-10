@@ -33,6 +33,10 @@ async def home(request):
         time.sleep(1)
     return render(request,'home.html')
 
+def chat(request,group_name=None):
+    print(group_name)
+    return render(request,'chat.html',{"groupname":group_name})
+
 
 def generate_student_data(request):
     total = request.GET.get('total')

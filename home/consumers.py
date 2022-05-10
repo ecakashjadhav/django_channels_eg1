@@ -54,14 +54,25 @@ class NewConsumer(AsyncJsonWebsocketConsumer):
 class MyJsonWebsocketConsumer(JsonWebsocketConsumer):
     def connect(self):
         print('Websocker connected')
+        print("Channel Layer: ",self.channel_layer)
+        print("Channel Name: ",self.channel_name)
+        #get group name from url parameter
+        self.group_name = self.scope['url_route']['kwargs']['groupname']
+        print("Group Name: ",self.group_name)
+        async_to_sync(self.channel_layer.group_add)(self.group_name,self.channel_name)
         self.accept()
 
     def receive_json(self, content, **kwargs):
         print('msg received..',content)
-        self.send_json({"msg":"send from server to client"})
+        async_to_sync(self.channel_layer.group_send)(self.group_name,{'type':'chat.message','message':content['msg']})
+    
+    def chat_message(self,event):
+        print("Event: ",event)
+        self.send_json({'message':event['message']})
 
     def disconnect(self,close_code):
         print('Websocker disconnected',close_code)
+        async_to_sync(self.channel_layer.group_discard)(self.group_name,self.channel_name)
 
 
 class MyAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
