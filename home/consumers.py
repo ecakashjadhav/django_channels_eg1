@@ -3,6 +3,7 @@ from asgiref.sync import async_to_sync
 import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer,JsonWebsocketConsumer
 from .models import *
+from channels.db import database_sync_to_async
 
 class TestConsumer(WebsocketConsumer):
 
@@ -90,3 +91,30 @@ class MyAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
 
     async def disconnect(self,close_code):
         print('Websocker disconnected',close_code)
+
+
+class ChatAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
+    async def connect(self):
+        print('Websocker connected')
+        print("Channel Layer: ",self.channel_layer)
+        print("Channel Name: ",self.channel_name)
+        #get group name from url parameter
+        self.group_name = self.scope['url_route']['kwargs']['groupname']
+        print("Group Name: ",self.group_name)
+        await self.channel_layer.group_add(self.group_name,self.channel_name)
+        await self.accept()
+
+    async def receive_json(self, content, **kwargs):
+        print('msg received..',content)
+        group = await database_sync_to_async(Group.objects.get)(name=self.group_name)
+        chat = Chat(content = content['msg'],group=group)
+        await database_sync_to_async(chat.save)()
+        await self.channel_layer.group_send(self.group_name,{'type':'chat.message','message':content['msg']})
+    
+    async def chat_message(self,event):
+        print("Event: ",event)
+        await self.send_json({'message':event['message']})
+
+    async def disconnect(self,close_code):
+        print('Websocker disconnected',close_code) 
+        await self.channel_layer.group_discard(self.group_name,self.channel_name)

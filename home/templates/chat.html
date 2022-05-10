@@ -38,7 +38,8 @@
     <script>
       const groupName = JSON.parse(document.getElementById("group-name").textContent);
       console.log("group Name: ",groupName);
-      var ws = new WebSocket('ws://'+window.location.host+'/ws/jwc/'+groupName+'/')
+      //var ws = new WebSocket('ws://'+window.location.host+'/ws/jwc/'+groupName+'/')
+      var ws = new WebSocket('ws://'+window.location.host+'/ws/ajwc/'+groupName+'/')
 
       ws.open = function(){
         console.log("open conn...")
