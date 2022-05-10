@@ -3,8 +3,10 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
 import time
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from .thread import *
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 # def home(request):
 #     for i in range(0,10):
@@ -47,3 +49,8 @@ def generate_student_data(request):
     CreateStudentThread(int(total)).start()
     return JsonResponse({"status":200})
 
+def msgFromOutsider(request):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)('india',{'type':'chat.message',
+                                        'message':'Message from outside consumer'})
+    return HttpResponse('Message sent from view to consumer')

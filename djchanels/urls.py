@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home),
     path('chat/<str:group_name>/',chat),
-    path('students/',generate_student_data)
+    path('students/',generate_student_data),
+    path('test/vtoc/',msgFromOutsider),# view to consumer msg send
 ]
