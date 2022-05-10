@@ -107,10 +107,14 @@ class ChatAsyncJsonWebsocketConsumer(AsyncJsonWebsocketConsumer):
     async def receive_json(self, content, **kwargs):
         print('msg received..',content)
         group = await database_sync_to_async(Group.objects.get)(name=self.group_name)
-        chat = Chat(content = content['msg'],group=group)
-        await database_sync_to_async(chat.save)()
-        await self.channel_layer.group_send(self.group_name,{'type':'chat.message','message':content['msg']})
-    
+        if self.scope['user'].is_authenticated:
+            chat = Chat(content = content['msg'],group=group)
+            await database_sync_to_async(chat.save)()
+            await self.channel_layer.group_send(self.group_name,{'type':'chat.message','message':content['msg']})
+        else:
+            await self.send_json({'message':'Login required'})
+
+        
     async def chat_message(self,event):
         print("Event: ",event)
         await self.send_json({'message':event['message']})
